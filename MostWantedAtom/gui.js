@@ -27,16 +27,16 @@ function initSearchByName(people){
 		lName = lName.slice(1, 2);
 		for (var i = 0; i < people.length; i++) {
 			if (people[i]["firstName"].toLowerCase() == fName[0].toLowerCase() && people[i]["lastName"].toLowerCase() == lName.toLowerCase()){
-				displayResults(people, i);	        
+				displayResults(people, i);
 			}
 		}
 		}else {
-		for (var j = 0; j < people.length;j++) {		
+		for (var j = 0; j < people.length;j++) {
 			if (people[i]["firstName"].toLowerCase() == inputName.toLowerCase() || people[i]["lastName"].toLowerCase() == inputName.toLowerCase()){
 				displayResults(people, i);
-			}			    
+			}
 		}
-	}  
+	}
 }
 
 function getIndexByName(people, input){
@@ -54,18 +54,18 @@ function getIndexByName(people, input){
 			}
 		}
 		}else{
-		for (var i = 0; i < people.length; i++) {		
+		for (var i = 0; i < people.length; i++) {
 			if (people[i]["firstName"].toLowerCase() == inputName.toLowerCase() || people[i]["lastName"].toLowerCase() == inputName.toLowerCase()){
 				return i;
-			}			    
-		}	    
+			}
+		}
 	}
 	return i;
 }
 function findName(people, input) {
 	var peopleMatch = people.filter(function(el)){
 	if(el.firstName.toLowerCase() == )
-	
+
 }
 }
 function descendantPrompt(people) {
@@ -97,8 +97,8 @@ function searchByDescendants(input, people, descendants=[]) {
 }
 
 
-	
-	
+
+
 function initSearchByTraits(){
 	;
 }
@@ -112,7 +112,7 @@ function displayResults(people, i) {
 	//alert(output);
 
 	////str = JSON.stringify(people[i])
-	////alert(str);    
+	////alert(str);
 }
 function isNumeric() {
 	;
