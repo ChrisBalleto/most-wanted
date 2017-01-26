@@ -135,3 +135,21 @@ function getOccupation(){
 //fucntion seearchByName(fname,lmane
 //    return poeple.filter(function(person){
 //    }))
+function getDescendants(id, people, descendants=[]){
+   var temporaryArray = people.filter(function(person){
+    return (person.parents.includes(id));
+  });
+    //descendants = descendants.concat(temporaryArray);
+    if (temporaryArray.length > 0){
+      descendants = descendants.concat(temporaryArray);
+      for (var i = 0;i <temporaryArray.length;i++){
+        var temp = getDescendants(temporaryArray[i].id, people, descendants);
+          if (temp.length > descendants.length){
+            descendants = temp;
+            break;
+          }
+      }
+    }else if (temporaryArray.length == 0){
+    }
+    return descendants;
+}

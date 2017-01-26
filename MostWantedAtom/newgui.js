@@ -1,4 +1,17 @@
 ﻿
+function searchByGender(eyeColor, people){
+  return people.filter(function(person){
+    return eyeColor.toLowerCase() == person.eyeColor.toLowerCase();
+});
+function searchByGender(occupation, people){
+    return people.filter(function(person){
+      return occuptation.toLowerCase() == person.occupation.toLowerCase();
+});
+function searchByGender(gender, people){
+    return people.filter(function(person){
+      return gender.toLowerCase() == person.gender.toLowerCase();
+});
+}
 function initSearchByFirstAndLastName(fName, lName, people) {
   return people.filter(function(person){
     return fName.toLowerCase() == person.firstName.toLowerCase() && lName.toLowerCase() == person.lastName.toLowerCase();
@@ -14,11 +27,17 @@ function initSearchByLastName(lName, people) {
     return  lName.toLowerCase() == person.lastName.toLowerCase();
 });
 }
-function getDescendants(id, people, descendants=[]){
-   return people.filter(function(person){
+function getDescendants(id, people, descendants=[], counter=-1){
+   var temporaryArray = people.filter(function(person){
     return (person.parents.includes(id));
   });
-
+    descendants = descendants.concat(temporaryArray);
+    if (counter !=descendants.length - 1){
+      counter++;
+      getDescendants(descendants[counter].id, people, descendants, counter);
+    }else{
+      displayResults(people, descendants);
+}
 }
 function getIdByName(fName, lName, people){
   return people.filter(function(person){
@@ -29,7 +48,9 @@ function getIdByName(fName, lName, people){
 function openPrompt(people) {
     var input = prompt("What would you like to search by? (name, traits, descendants, family, kin)");
     var nameInput = ["name", "nam"];
-    var traitInput = ["trait","trait"];
+    var traitInput = ["trait","traits", "triats", "triat"];
+    var familyInput = ["fam","family", "f", "famly"];
+    var kinInput = ["kin","next of kin", "kins", "k"];
     var descendantInput = ["des", "descendants", "descendant", "children", "kids", "spawn", "desc"];
     if (nameInput.includes(input.toLowerCase())) {
         searchByNamePrompt(people);
@@ -53,6 +74,7 @@ function descendantPrompt(){
   return prompt("Please enter First and Last name of person you would like decendants of:");
 }
 function traitPrompt() {
+  var input = prompt("What trait would you like to search?")
 
 }
 function searchByNamePrompt(people) {
@@ -81,6 +103,7 @@ function displayResults(people, subset){
     var object = subset[i];
     var firstName = object.firstName;
     var lastName = object.lastName;
+
     alert(firstName + " " + lastName + '\n' );
   }
   filterFurtherPrompt(subset, people);
