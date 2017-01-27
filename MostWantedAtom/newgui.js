@@ -11,7 +11,7 @@ function searchByWeight(weight, people){
 }
 function searchByHeight(height, people){
   return people.filter(function(person){
-    return height == person.height;
+    return convertFeetInchestoInchesString(height) == person.height;
     });
 }
 function searchByOccupation(occupation, people){
@@ -66,8 +66,13 @@ function getParents(person,people,family=[]){
     return (person.parents.includes(personInPeople.id));
   });
 }
+function getSiblings(person,people,family=[]){
+  return people.filter(function(personInPeople){
+    return (person.parents == personInPeople.parents && person.id != personInPeople.id);
+  });
+}
 function getFamily(person, people, family=[]){ //use .id for person parameter
-  family = family.concat(getParents(person, people), getSpouse(person.id, people), getChildren(person.id, people));
+  family = family.concat(getParents(person, people), getSpouse(person.id, people), getChildren(person.id, people), getSiblings(person, people));
   displayResultsVertical(people, family);
 }
 function getIdByName(fName, lName, people){
@@ -142,6 +147,25 @@ function searchByNamePrompt(people) {
       searchByNamePrompt();
     }
 }
+function getAgeFromDob(dob){
+  var splitDob = dob.split('/');
+  var ageMonth = splitDob[0];
+  var ageDay = splitDob[1];
+  var ageYear = splitDob[2];
+}
+function convertFeetInchestoInchesString(height){
+  var cleanHeight = height.replace(/['"]/g, "");
+  var feet = cleanHeight.slice(0, 1);
+  var inches = cleanHeight.slice(1, 2);
+  var totalInches = (parseInt(feet)*12)+parseInt(inches);
+  return totalInches;
+}
+function convertInchesToNumberAndFeetInches(inches){
+  inches = parseInt(inches);
+  var feet = Math.floor(inches / 12);
+  inches %= 12;
+  return feet+"'"+inches+'"';
+}
 function getFirstName(){
   return prompt("Enter First Name");
 }
@@ -156,7 +180,7 @@ function displaySingleResult(people, subset){
     var lastName = object.lastName;
     var gender = object.gender;
     var dob = object.dob;
-    var height = object.height;
+    var height = convertInchesToNumberAndFeetInches(object.height);
     var weight = object.weight;
     var eyeColor = object.eyeColor;
     var occupation = object.occupation;
