@@ -49,7 +49,26 @@ function getDescendants(id, people, descendants=[], counter=-1){
       getDescendants(descendants[counter].id, people, descendants, counter);
     }else{
       displayResultsVertical(people, descendants);
+  }
 }
+function getSpouse(id, people, family=[]){
+  return people.filter(function(person){
+    return(id == person.currentSpouse);
+  });
+}
+function getChildren(id,people,family=[]){
+  return people.filter(function(person){
+    return (person.parents.includes(id));
+  });
+}
+function getParents(person,people,family=[]){
+  return people.filter(function(personInPeople){
+    return (person.parents.includes(personInPeople.id));
+  });
+}
+function getFamily(person, people, family=[]){ //use .id for person parameter
+  family = family.concat(getParents(person, people), getSpouse(person.id, people), getChildren(person.id, people));
+  displayResultsVertical(people, family);
 }
 function getIdByName(fName, lName, people){
   return people.filter(function(person){
@@ -68,10 +87,12 @@ function openPrompt(people, subset=[], searchType="search") {
     }else if (traitInput.includes(input.toLowerCase())) {
         traitPrompt(people);
     }else if (descendantInput.includes(input.toLowerCase())) {
-        var descendants = [];
         var person = getIdByName(getFirstName(), getLastName(), people);
-        descendants = (getDescendants(person[0].id, people));
+        var descendants = (getDescendants(person[0].id, people));
         displayResultsVertical(people, descendants);
+    }else if(familyInput.includes(input.toLowerCase())){
+        person = getIdByName(getFirstName(), getLastName(), people);
+        var family = (getFamily(person[0], people));
     }else{
         alert("Please enter correct value");
         openPrompt(people);
@@ -115,7 +136,7 @@ function searchByNamePrompt(people) {
     }else if(input.toLowerCase() == "l"){
       displayResultsVertical(people, initSearchByLastName(getLastName(), people));
     }else if(input.toLowerCase() == "b"){
-      displayResults(people, initSearchByFirstAndLastName(getFirstName(), getLastName(), people));
+      displayResultsVertical(people, initSearchByFirstAndLastName(getFirstName(), getLastName(), people));
     }else{
       alert("please enter a valid respsonse");
       searchByNamePrompt();
@@ -127,23 +148,35 @@ function getFirstName(){
 function getLastName(){
   return prompt("Enter Last Name");
 }
-function displayResults(people, subset){
+function displaySingleResult(people, subset){
   var temporaryArray = subset;
   for (var i=0; i<temporaryArray.length;i++){
     var object = subset[i];
     var firstName = object.firstName;
     var lastName = object.lastName;
-    alert(firstName + " " + lastName + '\n' );
+    var gender = object.gender;
+    var dob = object.dob;
+    var height = object.height;
+    var weight = object.weight;
+    var eyeColor = object.eyeColor;
+    var occupation = object.occupation;
+    alert("Here is the only result..." + '\n'+'\n' + firstName + " " + lastName + '\n' + "Gender: " + gender + '\n' + "Date of Birth: " + dob + '\n' + "Weight: " + weight + " lbs" + '\n' + "Height: " + height + '\n'+ "Eye Color: " + eyeColor + '\n'+ "Occupation: " + occupation);
   }
-  filterFurtherPrompt(people, subset);
+  openPrompt(people);
 }
 function displayResultsVertical(people, subset){
   var temporaryArray = [];
   for (var i=0; i<subset.length;i++){
     temporaryArray[i] = subset[i].firstName + ' ' + subset[i].lastName;
   }
+  if(subset.length == 0){
+    alert("No results returned, thank you for searching!");
+    openPrompt(people);
+  }else if(subset.length == 1){
+    displaySingleResult(people, subset);
+  }
   alert(temporaryArray.join("\n"));
-  filterFurtherPrompt(people, subset)
+  filterFurtherPrompt(people, subset);
 }
 function filterFurtherPrompt(people, subset){
   var input = prompt("Would you like to filter these results further? Y or N?");
@@ -153,14 +186,4 @@ function filterFurtherPrompt(people, subset){
   }else if(input.toLowerCase() == "n"){
     openPrompt(people);
   }
-}
-function isNumeric() {
-}
-function getAge(){
-}
-function getHeight(){
-}
-function getWeight(){
-}
-function getEye(){
 }
