@@ -1,12 +1,24 @@
 ﻿
-function searchByGender(eyeColor, people){
+function searchByEyeColor(eyeColor, people){
   return people.filter(function(person){
     return eyeColor.toLowerCase() == person.eyeColor.toLowerCase();
 });
-function searchByGender(occupation, people){
+}
+function searchByWeight(weight, people){
+  return people.filter(function(person){
+    return weight == person.weight;
+    });
+}
+function searchByHeight(height, people){
+  return people.filter(function(person){
+    return height == person.height;
+    });
+}
+function searchByOccupation(occupation, people){
     return people.filter(function(person){
-      return occuptation.toLowerCase() == person.occupation.toLowerCase();
+      return occupation.toLowerCase() == person.occupation.toLowerCase();
 });
+}
 function searchByGender(gender, people){
     return people.filter(function(person){
       return gender.toLowerCase() == person.gender.toLowerCase();
@@ -36,7 +48,7 @@ function getDescendants(id, people, descendants=[], counter=-1){
       counter++;
       getDescendants(descendants[counter].id, people, descendants, counter);
     }else{
-      displayResults(people, descendants);
+      displayResultsVertical(people, descendants);
 }
 }
 function getIdByName(fName, lName, people){
@@ -44,46 +56,64 @@ function getIdByName(fName, lName, people){
     return (fName.toLowerCase() == person.firstName.toLowerCase() && lName.toLowerCase() == person.lastName.toLowerCase());
 });
 }
-
-function openPrompt(people) {
-    var input = prompt("What would you like to search by? (name, traits, descendants, family, kin)");
-    var nameInput = ["name", "nam"];
-    var traitInput = ["trait","traits", "triats", "triat"];
+function openPrompt(people, subset=[], searchType="search") {
+    var input = prompt("What would you like to "+searchType+"? (N)ame, (T)raits, (D)escendants, (F)amily, (K)in");
+    var nameInput = ["name", "nam","n"];
+    var traitInput = ["trait","traits", "triats", "triat", "t"];
     var familyInput = ["fam","family", "f", "famly"];
     var kinInput = ["kin","next of kin", "kins", "k"];
-    var descendantInput = ["des", "descendants", "descendant", "children", "kids", "spawn", "desc"];
+    var descendantInput = ["des", "descendants", "descendant", "children", "kids", "spawn", "desc","d"];
     if (nameInput.includes(input.toLowerCase())) {
         searchByNamePrompt(people);
-    }
-    else if (traitInput.includes(input.toLowerCase())) {
+    }else if (traitInput.includes(input.toLowerCase())) {
         traitPrompt(people);
-    }
-    else if (descendantInput.includes(input.toLowerCase())) {
+    }else if (descendantInput.includes(input.toLowerCase())) {
         var descendants = [];
         var person = getIdByName(getFirstName(), getLastName(), people);
         descendants = (getDescendants(person[0].id, people));
-        //descendants = (getDescendants(descendants[0].id, people, descendants));
-        displayResults(people, descendants);
-    }
-    else {
+        displayResultsVertical(people, descendants);
+    }else{
         alert("Please enter correct value");
         openPrompt(people);
     }
 }
+function getTrait(trait){
+  return prompt("Please enter the " + trait);
+}
 function descendantPrompt(){
   return prompt("Please enter First and Last name of person you would like decendants of:");
 }
-function traitPrompt() {
-  var input = prompt("What trait would you like to search?")
-
+function traitPrompt(people, subset) {
+  var input = prompt("What trait would you like to search? (G)ender, (H)eight, (W)eight, (E)ye Color, (O)ccupation, (A)ge");
+  if(input.toLowerCase() == "g"){
+    var trait = "gender.";
+    displayResultsVertical(people, searchByGender(getTrait(trait), people));
+  }else if(input.toLowerCase() == "h"){
+    trait = "height in #'#\".";
+    displayResultsVertical(people, searchByHeight(getTrait(trait), people));
+  }else if(input.toLowerCase() == "w"){
+    trait = "weight in pounds.";
+    displayResultsVertical(people, searchByWeight(getTrait(trait), people));
+  }else if(input.toLowerCase() == "e"){
+    trait = "eye color.";
+    displayResultsVertical(people, searchByEyeColor(getTrait(trait), people));
+  }else if(input.toLowerCase() == "o"){
+    trait = "occupation.";
+    displayResultsVertical(people, searchByOccupation(getTrait(trait), people));
+  }else if(input.toLowerCase() == "a"){
+    trait = "age in years.";
+    displayResultsVertical(people, initSearchByFirstAndLastName(getTrait(trait), people));
+  }else{
+    alert("please enter a valid respsonse");
+    searchByNamePrompt(people);
+  }
 }
 function searchByNamePrompt(people) {
-  var personSearch = [];
     var input = prompt("Do you know the (F)irst Name, (L)ast name, or (B)oth?");
     if(input.toLowerCase() == "f"){
-      displayResults(people, initSearchByFirstName(getFirstName(), people));
+      displayResultsVertical(people, initSearchByFirstName(getFirstName(), people));
     }else if(input.toLowerCase() == "l"){
-      displayResults(people, initSearchByLastName(getLastName(), people));
+      displayResultsVertical(people, initSearchByLastName(getLastName(), people));
     }else if(input.toLowerCase() == "b"){
       displayResults(people, initSearchByFirstAndLastName(getFirstName(), getLastName(), people));
     }else{
@@ -103,29 +133,34 @@ function displayResults(people, subset){
     var object = subset[i];
     var firstName = object.firstName;
     var lastName = object.lastName;
-
     alert(firstName + " " + lastName + '\n' );
   }
-  filterFurtherPrompt(subset, people);
+  filterFurtherPrompt(people, subset);
 }
-function filterFurtherPrompt(subset, people){
-  return prompt("Would you like to filter these results further?");
+function displayResultsVertical(people, subset){
+  var temporaryArray = [];
+  for (var i=0; i<subset.length;i++){
+    temporaryArray[i] = subset[i].firstName + ' ' + subset[i].lastName;
+  }
+  alert(temporaryArray.join("\n"));
+  filterFurtherPrompt(people, subset)
+}
+function filterFurtherPrompt(people, subset){
+  var input = prompt("Would you like to filter these results further? Y or N?");
+  if(input.toLowerCase() == "y"){
+    var searchType = "filter";
+    openPrompt(subset, searchType);
+  }else if(input.toLowerCase() == "n"){
+    openPrompt(people);
+  }
 }
 function isNumeric() {
-
 }
 function getAge(){
-
 }
 function getHeight(){
-
 }
 function getWeight(){
-
 }
 function getEye(){
-
-}
-function getOccupation(){
-
 }
