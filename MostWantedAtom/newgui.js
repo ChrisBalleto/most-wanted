@@ -4,6 +4,16 @@ function searchByEyeColor(eyeColor, people){
     return eyeColor.toLowerCase() == person.eyeColor.toLowerCase();
 });
 }
+function searchByAge(age, people){
+  return people.filter(function(person){
+    return age == getAgeFromDob(person.dob);
+  });
+}
+function searchByAgeRange(startRange, endRange, people){
+  return people.filter(function(person){
+    return startRange <= getAgeFromDob(person.dob) && endRange >= getAgeFromDob(person.dob);
+  });
+}
 function searchByWeight(weight, people){
   return people.filter(function(person){
     return weight == person.weight;
@@ -110,7 +120,7 @@ function descendantPrompt(){
   return prompt("Please enter First and Last name of person you would like decendants of:");
 }
 function traitPrompt(people, subset) {
-  var input = prompt("What trait would you like to search? (G)ender, (H)eight, (W)eight, (E)ye Color, (O)ccupation, (A)ge");
+  var input = prompt("What trait would you like to search? (G)ender, (H)eight, (W)eight, (E)ye Color, (O)ccupation, (A)ge, or Age (R)ange");
   if(input.toLowerCase() == "g"){
     var trait = "gender.";
     displayResultsVertical(people, searchByGender(getTrait(trait), people));
@@ -128,7 +138,10 @@ function traitPrompt(people, subset) {
     displayResultsVertical(people, searchByOccupation(getTrait(trait), people));
   }else if(input.toLowerCase() == "a"){
     trait = "age in years.";
-    displayResultsVertical(people, initSearchByFirstAndLastName(getTrait(trait), people));
+    displayResultsVertical(people, searchByAge(getTrait(trait), people));
+  }else if(input.toLowerCase() == "r"){
+    trait = "age range.";
+    displayResultsVertical(people, searchByAge(getTrait(trait), people));
   }else{
     alert("please enter a valid respsonse");
     searchByNamePrompt(people);
@@ -149,9 +162,20 @@ function searchByNamePrompt(people) {
 }
 function getAgeFromDob(dob){
   var splitDob = dob.split('/');
-  var ageMonth = splitDob[0];
-  var ageDay = splitDob[1];
-  var ageYear = splitDob[2];
+  var ageMonth = parseInt(splitDob[0]);
+  var ageDay = parseInt(splitDob[1]);
+  var ageYear = parseInt(splitDob[2]);
+  var today = new Date();
+  var todayYear = today.getFullYear();
+  var todayMonth = today.getMonth();
+  var todayDay = today.getDate();
+  var age = todayYear - ageYear;
+  if( todayMonth < (ageMonth - 1)){
+    age--;
+  }else if (((ageMonth - 1) == todayMonth) && (todayDay < ageDay)){
+    age--;
+  }
+  return age;
 }
 function convertFeetInchestoInchesString(height){
   var cleanHeight = height.replace(/['"]/g, "");
@@ -179,12 +203,12 @@ function displaySingleResult(people, subset){
     var firstName = object.firstName;
     var lastName = object.lastName;
     var gender = object.gender;
-    var dob = object.dob;
+    var dob = getAgeFromDob(object.dob);
     var height = convertInchesToNumberAndFeetInches(object.height);
     var weight = object.weight;
     var eyeColor = object.eyeColor;
     var occupation = object.occupation;
-    alert("Here is the only result..." + '\n'+'\n' + firstName + " " + lastName + '\n' + "Gender: " + gender + '\n' + "Date of Birth: " + dob + '\n' + "Weight: " + weight + " lbs" + '\n' + "Height: " + height + '\n'+ "Eye Color: " + eyeColor + '\n'+ "Occupation: " + occupation);
+    alert("Here is the only result..." + '\n'+'\n' + firstName + " " + lastName + '\n' + "Gender: " + gender + '\n' + "Age: " + dob + '\n' + "Weight: " + weight + " lbs" + '\n' + "Height: " + height + '\n'+ "Eye Color: " + eyeColor + '\n'+ "Occupation: " + occupation);
   }
   openPrompt(people);
 }
