@@ -71,15 +71,19 @@ function getChildren(id,people,family=[]){
     return (person.parents.includes(id));
   });
 }
-function getParents(person,people,family=[]){
+function getParents(personInPeople,people,family=[]){
   return people.filter(function(personInPeople){
     return (person.parents.includes(personInPeople.id));
   });
 }
-function getSiblings(person,people,family=[]){
+function getSiblings(personInPeople,people,family=[]){
   return people.filter(function(personInPeople){
     return (person.parents == personInPeople.parents && person.id != personInPeople.id);
   });
+}
+function getNephewNeice(person, people, kin=[]){
+  return people.filter(function(person))
+
 }
 function getFamily(person, people, family=[]){ //use .id for person parameter
   family = family.concat(getParents(person, people), getSpouse(person.id, people), getChildren(person.id, people), getSiblings(person, people));
@@ -108,40 +112,46 @@ function openPrompt(people, subset=[], searchType="search") {
     }else if(familyInput.includes(input.toLowerCase())){
         person = getIdByName(getFirstName(), getLastName(), people);
         var family = (getFamily(person[0], people));
+    }else if (kinInput.includes(input.toLowerCase())) {
+        kinPrompt(people);
     }else{
         alert("Please enter correct value");
         openPrompt(people);
     }
 }
-function getTrait(trait){
+function getTraitPrompt(trait){
   return prompt("Please enter the " + trait);
 }
 function descendantPrompt(){
   return prompt("Please enter First and Last name of person you would like decendants of:");
 }
+function kinPrompt(){
+return prompt("Please enter the First and Last name of the person you would like to find next of kid of:");
+}
 function traitPrompt(people, subset) {
   var input = prompt("What trait would you like to search? (G)ender, (H)eight, (W)eight, (E)ye Color, (O)ccupation, (A)ge, or Age (R)ange");
   if(input.toLowerCase() == "g"){
     var trait = "gender.";
-    displayResultsVertical(people, searchByGender(getTrait(trait), people));
+    displayResultsVertical(people, searchByGender(getTraitPrompt(trait), people));
   }else if(input.toLowerCase() == "h"){
     trait = "height in #'#\".";
-    displayResultsVertical(people, searchByHeight(getTrait(trait), people));
+    displayResultsVertical(people, searchByHeight(getTraitPrompt(trait), people));
   }else if(input.toLowerCase() == "w"){
     trait = "weight in pounds.";
-    displayResultsVertical(people, searchByWeight(getTrait(trait), people));
+    displayResultsVertical(people, searchByWeight(getTraitPrompt(trait), people));
   }else if(input.toLowerCase() == "e"){
     trait = "eye color.";
-    displayResultsVertical(people, searchByEyeColor(getTrait(trait), people));
+    displayResultsVertical(people, searchByEyeColor(getTraitPrompt(trait), people));
   }else if(input.toLowerCase() == "o"){
     trait = "occupation.";
-    displayResultsVertical(people, searchByOccupation(getTrait(trait), people));
+    displayResultsVertical(people, searchByOccupation(getTraitPrompt(trait), people));
   }else if(input.toLowerCase() == "a"){
     trait = "age in years.";
-    displayResultsVertical(people, searchByAge(getTrait(trait), people));
+    displayResultsVertical(people, searchByAge(getTraitPrompt(trait), people));
   }else if(input.toLowerCase() == "r"){
-    trait = "age range.";
-    displayResultsVertical(people, searchByAge(getTrait(trait), people));
+    trait = "age range. (##-##)";
+    var range = getTraitPrompt(trait);
+    displayResultsVertical(people, searchByAgeRange(getAgeRangeStart(range), getAgeRangeEnd(range), people));
   }else{
     alert("please enter a valid respsonse");
     searchByNamePrompt(people);
@@ -192,6 +202,14 @@ function convertInchesToNumberAndFeetInches(inches){
 }
 function getFirstName(){
   return prompt("Enter First Name");
+}
+function getAgeRangeStart(range){
+  var rangeStart = parseInt(range.split('-')[0]);
+  return rangeStart;
+}
+function getAgeRangeEnd(range){
+  var rangeEnd = parseInt(range.split('-')[1]);
+  return rangeEnd;
 }
 function getLastName(){
   return prompt("Enter Last Name");
