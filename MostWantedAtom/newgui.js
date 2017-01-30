@@ -63,7 +63,7 @@ function getDescendants(id, people, descendants=[], counter=-1){
 }
 function getSpouse(personId, people, family=[]){
   return people.filter(function(person){
-    return(personId == person.currentSpouse);
+    return(personId === person.currentSpouse);
   });
 }
 function getChildren(id,people,family=[]){
@@ -109,7 +109,7 @@ function getKin(person, people, kin=[]){
   //personParentsSiblingsSpouses = getBloodAuntUncleSpouse(person, people, personParentsSiblings);
   var personNeiceNephew = [];
   personNeiceNephew = getNephewNeice(person, people, personSiblings);
-  kin = kin.concat(personNeiceNephew, getFamily(person, people), getSpouse(person.id, people));
+  kin = kin.concat(personNeiceNephew, getFamily(person, people));
   displayResultsVertical(people, kin);
 }
 function getFamily(person, people, family=[]){ //use .id for person parameter
