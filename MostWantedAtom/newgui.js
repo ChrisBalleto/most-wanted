@@ -61,9 +61,9 @@ function getDescendants(id, people, descendants=[], counter=-1){
       displayResultsVertical(people, descendants);
   }
 }
-function getSpouse(id, people, family=[]){
+function getSpouse(personId, people, family=[]){
   return people.filter(function(person){
-    return(id == person.currentSpouse);
+    return(personId == person.currentSpouse);
   });
 }
 function getChildren(id,people,family=[]){
@@ -78,7 +78,7 @@ function getParents(person,people,family=[]){
 }
 function getSiblings(person, people,family=[]){
   return people.filter(function(personInPeople){
-    return (person.parents[0] === personInPeople.parents[0] && person.id != personInPeople.id && person.parents.length <= 1);
+    return (personInPeople.parents.length < 0  && person.parents.includes(personInPeople.parents) && person.id != personInPeople.id);
   });
 }
 function getBloodAuntUncle(person, people, parents){
@@ -106,15 +106,15 @@ function getKin(person, people, kin=[]){
   var personParentsSiblings = [];
   personParentsSiblings = getBloodAuntUncle(person, people, personParents);
   var personParentsSiblingsSpouses = [];
-  personParentsSiblingsSpouses = getBloodAuntUncleSpouse(person, people, personParentsSiblings);
+  //personParentsSiblingsSpouses = getBloodAuntUncleSpouse(person, people, personParentsSiblings);
   var personNeiceNephew = [];
   personNeiceNephew = getNephewNeice(person, people, personSiblings);
-  kin = kin.concat(personParentsSiblings, personNeiceNephew);
+  kin = kin.concat(personNeiceNephew, getFamily(person, people), getSpouse(person.id, people));
   displayResultsVertical(people, kin);
 }
 function getFamily(person, people, family=[]){ //use .id for person parameter
   family = family.concat(getParents(person, people), getSpouse(person.id, people), getChildren(person.id, people), getSiblings(person, people));
-  displayResultsVertical(people, family);
+    return family;
 }
 function getIdByName(fName, lName, people){
   return people.filter(function(person){
@@ -139,6 +139,7 @@ function openPrompt(people, subset=[], searchType="search") {
     }else if(familyInput.includes(input.toLowerCase())){
         person = getIdByName(getFirstName(), getLastName(), people);
         var family = (getFamily(person[0], people));
+        displayResultsVertical(people, family);
     }else if (kinInput.includes(input.toLowerCase())) {
         person = getIdByName(getFirstName(), getLastName(), people);
         getKin(person[0], people);
