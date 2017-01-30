@@ -16,7 +16,7 @@ function searchByAgeRange(startRange, endRange, people){
 }
 function searchByWeight(weight, people){
   return people.filter(function(person){
-    return weight == person.weight;
+    return parseInt(weight) == person.weight;
     });
 }
 function searchByHeight(height, people){
@@ -71,19 +71,46 @@ function getChildren(id,people,family=[]){
     return (person.parents.includes(id));
   });
 }
-function getParents(personInPeople,people,family=[]){
+function getParents(person,people,family=[]){
   return people.filter(function(personInPeople){
-    return (person.parents.includes(personInPeople.id));
+    return (person.parents.includes(personInPeople.id) && person.parents != []);
   });
 }
-function getSiblings(personInPeople,people,family=[]){
+function getSiblings(person, people,family=[]){
   return people.filter(function(personInPeople){
-    return (person.parents == personInPeople.parents && person.id != personInPeople.id);
+    return (person.parents[0] === personInPeople.parents[0] && person.id != personInPeople.id && person.parents.length <= 1);
   });
 }
-function getNephewNeice(person, people, kin=[]){
-  return people.filter(function(person))
-
+function getBloodAuntUncle(person, people, parents){
+  for(var i = 0; i <parents.length;i++){
+    return getSiblings(parents[i], people);
+  }
+}
+function getBloodAuntUncleSpouse(person, people, spouses){
+  for(var i = 0; i <spouses.length;i++){
+    return getSpouse(spouses[i], people);
+  }
+}
+function getNephewNeice(person, people, auntsUncles){
+  var nephewNeice = [];
+  auntsUncles.forEach(function(el){
+   nephewNeice = nephewNeice.concat(getChildren(el.id, people)); //changed auntsUncles from people
+ });
+ return nephewNeice;
+}
+function getKin(person, people, kin=[]){
+  var personSiblings = [];
+  personSiblings = personSiblings.concat(getSiblings(person, people));
+  var personParents = [];
+  personParents = personParents.concat(getParents(person,people));
+  var personParentsSiblings = [];
+  personParentsSiblings = getBloodAuntUncle(person, people, personParents);
+  var personParentsSiblingsSpouses = [];
+  personParentsSiblingsSpouses = getBloodAuntUncleSpouse(person, people, personParentsSiblings);
+  var personNeiceNephew = [];
+  personNeiceNephew = getNephewNeice(person, people, personSiblings);
+  kin = kin.concat(personParentsSiblings, personNeiceNephew);
+  displayResultsVertical(people, kin);
 }
 function getFamily(person, people, family=[]){ //use .id for person parameter
   family = family.concat(getParents(person, people), getSpouse(person.id, people), getChildren(person.id, people), getSiblings(person, people));
@@ -104,7 +131,7 @@ function openPrompt(people, subset=[], searchType="search") {
     if (nameInput.includes(input.toLowerCase())) {
         searchByNamePrompt(people);
     }else if (traitInput.includes(input.toLowerCase())) {
-        traitPrompt(people);
+        traitPrompt(people, subset, searchType);
     }else if (descendantInput.includes(input.toLowerCase())) {
         var person = getIdByName(getFirstName(), getLastName(), people);
         var descendants = (getDescendants(person[0].id, people));
@@ -113,7 +140,8 @@ function openPrompt(people, subset=[], searchType="search") {
         person = getIdByName(getFirstName(), getLastName(), people);
         var family = (getFamily(person[0], people));
     }else if (kinInput.includes(input.toLowerCase())) {
-        kinPrompt(people);
+        person = getIdByName(getFirstName(), getLastName(), people);
+        getKin(person[0], people);
     }else{
         alert("Please enter correct value");
         openPrompt(people);
@@ -122,14 +150,8 @@ function openPrompt(people, subset=[], searchType="search") {
 function getTraitPrompt(trait){
   return prompt("Please enter the " + trait);
 }
-function descendantPrompt(){
-  return prompt("Please enter First and Last name of person you would like decendants of:");
-}
-function kinPrompt(){
-return prompt("Please enter the First and Last name of the person you would like to find next of kid of:");
-}
-function traitPrompt(people, subset) {
-  var input = prompt("What trait would you like to search? (G)ender, (H)eight, (W)eight, (E)ye Color, (O)ccupation, (A)ge, or Age (R)ange");
+function traitPrompt(people, subset, searchType) {
+  var input = prompt("What trait would you like to " + searchType+"? (G)ender, (H)eight, (W)eight, (E)ye Color, (O)ccupation, (A)ge, or Age (R)ange");
   if(input.toLowerCase() == "g"){
     var trait = "gender.";
     displayResultsVertical(people, searchByGender(getTraitPrompt(trait), people));
@@ -248,7 +270,7 @@ function filterFurtherPrompt(people, subset){
   var input = prompt("Would you like to filter these results further? Y or N?");
   if(input.toLowerCase() == "y"){
     var searchType = "filter";
-    openPrompt(subset, searchType);
+    openPrompt(subset, subset, searchType);
   }else if(input.toLowerCase() == "n"){
     openPrompt(people);
   }
