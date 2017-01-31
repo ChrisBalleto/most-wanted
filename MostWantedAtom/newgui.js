@@ -94,10 +94,14 @@ function getBloodAuntUncleSpouse(person, people, spouses){
 }
 function getGrandParents(person, people){
   var personParents = getParents(person, people);
-  if (personParents.length > 0){
   for(var i = 0; i < personParents.length;i++){
     return getParents(personParents[i], people);
-  }
+}
+}
+function getGreatGrandParents(person, people){
+  var personGrandParents = getGrandParents(person, people);
+  for(var i = 0; i < personGrandParents.length;i++){
+    return getParents(personGrandParents[i], people);
 }
 }
 function getGrandChildren(person, people){
@@ -106,12 +110,19 @@ function getGrandChildren(person, people){
       return getChildren(personChildren[i], people);
     }
   }
-function removeUndefinded(subset, people){
+  function getGreatGrandChildren(person, people){
+    var personGrandChildren = getGrandChildren(person, people);
+      for(var i = 0; i < personGrandChildren.length; i++){
+        return getChildren(personGrandChildren[i], people);
+      }
+    }
+function removeUndefinded(subset){
+  var cleanArray = new Array();
   for (var i = 0; i < subset.length;i++){
-    if(subset[i] === undefined){
-      subset.pop(subset[i]);
+    if(subset[i]){
+      cleanArray.push(subset[i]);
     }else{
-      return subset;
+      return cleanArray;
     }
   }
 }
@@ -140,11 +151,13 @@ function getKin(person, people, kin=[]){
   var personNeiceNephew =  getNephewNeice(person, people);
   var grandParents = getGrandParents(person, people);
   var grandChildren = getGrandChildren(person, people);
-  kin = kin.concat(personNeiceNephew, getFamily(person, people), bloodAuntUncle, grandParents, grandChildren);
-  displayResultsVertical(people, kin.clean(undefined));
+  var greatGrandParents = getGreatGrandParents(person, people);
+  var greatGrandChildren = getGreatGrandChildren(person, people);
+  kin = kin.concat(getFamily(person, people), grandChildren, grandParents, personNeiceNephew, bloodAuntUncle);
+  displayResultsVertical(people, removeUndefinded(kin));
 }
 function getFamily(person, people, family=[]){ //use .id for person parameter
-  family = family.concat(getParents(person, people), getSpouse(person.id, people), getChildren(person.id, people), getSiblings(person, people));
+  family = family.concat(getSpouse(person.id, people), getChildren(person.id, people), getParents(person, people), getSiblings(person, people));
     return family;
 }
 function getPersonArrayByName(fName, lName, people){
