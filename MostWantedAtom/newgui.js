@@ -92,6 +92,19 @@ function getBloodAuntUncleSpouse(person, people, spouses){
     return getSpouse(spouses[i], people);
   }
 }
+function getGrandParents(person, people){
+  var personParents = getParents(person, people);
+  for(var i = 0; i < personParents.length;i++){
+    return getParents(personParents[i], people);
+  }
+}
+function getGrandChildren(person, people){
+  var personChildren = getChildren(person, people);
+    for(var i = 0; i < personChildren.length; i++){
+      return getChildren(personChildren[i], people);
+    }
+  }
+
 function getNephewNeice(person, people, auntsUncles=[]){
   var nephewNeice = [];
   auntsUncles = [];
@@ -113,9 +126,10 @@ function getKin(person, people, kin=[]){
   bloodAuntUncle = getBloodAuntUncle(person, people);
   var personParentsSiblingsSpouses = [];
   personParentsSiblingsSpouses = getBloodAuntUncleSpouse(person, people, bloodAuntUncle);
-  var personNeiceNephew = [];
-  personNeiceNephew = getNephewNeice(person, people);
-  kin = kin.concat(personNeiceNephew, getFamily(person, people), bloodAuntUncle, personParentsSiblingsSpouses);
+  var personNeiceNephew =  getNephewNeice(person, people);
+  var grandParents = getGrandParents(person, people);
+  var grandChildren = getGrandChildren(person, people);
+  kin = kin.concat(personNeiceNephew, getFamily(person, people), bloodAuntUncle, grandParents, grandChildren);
   displayResultsVertical(people, kin);
 }
 function getFamily(person, people, family=[]){ //use .id for person parameter
@@ -180,7 +194,7 @@ function traitPrompt(people, subset, searchType) {
   }else if(input.toLowerCase() == "r"){
     trait = "age range. (##-##)";
     var range = getTraitPrompt(trait);
-    displayResultsVertical(people, searchByAgeRange(range, people));
+    displayResultsVertical(people, searchByAgeRange(getAgeRangeStart(range), getAgeRangeEnd(range), people));
   }else{
     alert("please enter a valid respsonse");
     searchByNamePrompt(people);

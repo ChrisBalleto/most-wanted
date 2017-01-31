@@ -80,3 +80,33 @@ describe('function getNephewNeice', function(){
     expect(getNephewNeice(person, people)).toEqual(expected);
   });
 });
+
+describe('function getAgeFromDob', function(){
+  it('12/23/1969', function(){
+    expect(getAgeFromDob('12/23/1969')).toEqual(47);
+  });
+});
+
+describe('function convertFeetInchestoInchesString', function(){
+  it("6"+'"'+'7'+"'", function(){
+    expect(convertInchesToNumberAndFeetInches(81)).toEqual("6"+"'"+'9'+'"');
+  });
+});
+
+describe('function convertInchesToNumberAndFeetInches', function(){
+  it("6"+'"'+'7'+"'", function(){
+    expect(convertFeetInchestoInchesString("6"+"'"+'7'+'"')).toEqual(79);
+  });
+});
+
+describe('function getAgeRangeEnd', function(){
+  it("45-98", function(){
+    expect(getAgeRangeEnd("45-98")).toEqual(98);
+  });
+});
+
+describe('function getAgeRangeStart', function(){
+  it("45-98", function(){
+    expect(getAgeRangeStart("45-98")).toEqual(45);
+  });
+});
