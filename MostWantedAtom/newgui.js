@@ -2,7 +2,7 @@
 function searchByEyeColor(eyeColor, people){
   return people.filter(function(person){
     return eyeColor.toLowerCase() == person.eyeColor.toLowerCase();
-});
+  });
 }
 function searchByAge(age, people){
   return people.filter(function(person){
@@ -17,48 +17,48 @@ function searchByAgeRange(range, people){
 function searchByWeight(weight, people){
   return people.filter(function(person){
     return parseInt(weight) == person.weight;
-    });
+  });
 }
 function searchByHeight(height, people){
   return people.filter(function(person){
     return convertFeetInchestoInchesString(height) == person.height;
-    });
+  });
 }
 function searchByOccupation(occupation, people){
-    return people.filter(function(person){
-      return occupation.toLowerCase() == person.occupation.toLowerCase();
-});
+  return people.filter(function(person){
+    return occupation.toLowerCase() == person.occupation.toLowerCase();
+  });
 }
 function searchByGender(gender, people){
-    return people.filter(function(person){
-      return gender.toLowerCase() == person.gender.toLowerCase();
-});
+  return people.filter(function(person){
+    return gender.toLowerCase() == person.gender.toLowerCase();
+  });
 }
 function initSearchByFirstAndLastName(fName, lName, people) {
   return people.filter(function(person){
     return fName.toLowerCase() == person.firstName.toLowerCase() && lName.toLowerCase() == person.lastName.toLowerCase();
-});
+  });
 }
 function initSearchByFirstName(fName, people) {
   return people.filter(function(person){
     return fName.toLowerCase() == person.firstName.toLowerCase();
-});
+  });
 }
 function initSearchByLastName(lName, people) {
   return people.filter(function(person){
     return  lName.toLowerCase() == person.lastName.toLowerCase();
-});
+  });
 }
 function getDescendants(id, people, descendants=[], counter=-1){
-   var temporaryArray = people.filter(function(person){
+  var temporaryArray = people.filter(function(person){
     return (person.parents.includes(id));
   });
-    descendants = descendants.concat(temporaryArray);
-    if (counter !=descendants.length - 1){
-      counter++;
-      getDescendants(descendants[counter].id, people, descendants, counter);
-    }else{
-      displayResultsVertical(people, descendants);
+  descendants = descendants.concat(temporaryArray);
+  if (counter !=descendants.length - 1){
+    counter++;
+    getDescendants(descendants[counter].id, people, descendants, counter);
+  }else{
+    displayResultsVertical(people, descendants);
   }
 }
 function getSpouse(personId, people, family=[]){
@@ -78,7 +78,7 @@ function getParents(person,people,family=[]){
 }
 function getSiblings(person, people,family=[]){
   return people.filter(function(personInPeople){
-    return (personInPeople.parents.length > 0  && person.parents[1] == personInPeople.parents[1] && person.id != personInPeople.id);
+    return (personInPeople.parents.length > 0  && person.parents[0] == personInPeople.parents[0] && person.id != personInPeople.id);
   });
 }
 function getBloodAuntUncle(person, people, parents=[]){
@@ -96,26 +96,28 @@ function getGrandParents(person, people){
   var personParents = getParents(person, people);
   for(var i = 0; i < personParents.length;i++){
     return getParents(personParents[i], people);
-}
+  }
 }
 function getGreatGrandParents(person, people){
   var personGrandParents = getGrandParents(person, people);
   for(var i = 0; i < personGrandParents.length;i++){
     return getParents(personGrandParents[i], people);
-}
+  }
 }
 function getGrandChildren(person, people){
-  var personChildren = getChildren(person, people);
-    for(var i = 0; i < personChildren.length; i++){
-      return getChildren(personChildren[i], people);
-    }
+  var grandChildren = [];
+  var personChildren = getChildren(person.id, people);
+  personChildren.forEach(function(el){
+    grandChildren = grandChildren.concat(getChildren(el.id, people));
+  });
+  return grandChildren;
+}
+function getGreatGrandChildren(person, people){
+  var personGrandChildren = getGrandChildren(person, people);
+  for(var i = 0; i < personGrandChildren.length; i++){
+    return getChildren(personGrandChildren[i], people);
   }
-  function getGreatGrandChildren(person, people){
-    var personGrandChildren = getGrandChildren(person, people);
-      for(var i = 0; i < personGrandChildren.length; i++){
-        return getChildren(personGrandChildren[i], people);
-      }
-    }
+}
 function removeUndefinded(subset){
   var cleanArray = new Array();
   for (var i = 0; i < subset.length;i++){
@@ -135,9 +137,9 @@ function getNephewNeice(person, people, auntsUncles=[]){
   auntsUncles = auntsUncles.concat(parentsSiblings);
 
   auntsUncles.forEach(function(el){
-   nephewNeice = nephewNeice.concat(getChildren(el.id, people)); //changed auntsUncles from people
- });
- return nephewNeice;
+    nephewNeice = nephewNeice.concat(getChildren(el.id, people)); //changed auntsUncles from people
+  });
+  return nephewNeice;
 }
 function getKin(person, people, kin=[]){
   var personSiblings = [];
@@ -147,50 +149,59 @@ function getKin(person, people, kin=[]){
   var bloodAuntUncle = [];
   bloodAuntUncle = getBloodAuntUncle(person, people);
   var personParentsSiblingsSpouses = [];
-  personParentsSiblingsSpouses = getBloodAuntUncleSpouse(person, people, bloodAuntUncle);
+  //personParentsSiblingsSpouses = getBloodAuntUncleSpouse(person, people, bloodAuntUncle);
   var personNeiceNephew =  getNephewNeice(person, people);
-  var grandParents = getGrandParents(person, people);
-  var grandChildren = getGrandChildren(person, people);
+  if (personParents != undefined){
+    var grandParents = getGrandParents(person, people);
+  }
+  if (getChildren(person, people) != undefined){
+    var grandChildren = getGrandChildren(person, people);
+  }
+  if(grandParents != undefined){
   var greatGrandParents = getGreatGrandParents(person, people);
+}
+if(grandChildren != undefined){
   var greatGrandChildren = getGreatGrandChildren(person, people);
-  kin = kin.concat(getFamily(person, people), grandChildren, grandParents, personNeiceNephew, bloodAuntUncle);
+}
+  kin = kin.concat(getFamily(person, people), grandChildren, grandParents, personNeiceNephew, bloodAuntUncle, greatGrandChildren, greatGrandParents);
   displayResultsVertical(people, removeUndefinded(kin));
 }
-function getFamily(person, people, family=[]){ //use .id for person parameter
+function getFamily(person, people, family=[]){
+  var siblings = getSiblings(person, people);//use .id for person parameter
   family = family.concat(getSpouse(person.id, people), getChildren(person.id, people), getParents(person, people), getSiblings(person, people));
-    return family;
+  return family;
 }
 function getPersonArrayByName(fName, lName, people){
   return people.filter(function(person){
     return (fName.toLowerCase() == person.firstName.toLowerCase() && lName.toLowerCase() == person.lastName.toLowerCase());
-});
+  });
 }
 function openPrompt(people, subset=[], searchType="search") {
-    var input = prompt("What would you like to "+searchType+"? (N)ame, (T)raits, (D)escendants, (F)amily, (K)in");
-    var nameInput = ["name", "nam","n"];
-    var traitInput = ["trait","traits", "triats", "triat", "t"];
-    var familyInput = ["fam","family", "f", "famly"];
-    var kinInput = ["kin","next of kin", "kins", "k"];
-    var descendantInput = ["des", "descendants", "descendant", "children", "kids", "spawn", "desc","d"];
-    if (nameInput.includes(input.toLowerCase())) {
-        searchByNamePrompt(people);
-    }else if (traitInput.includes(input.toLowerCase())) {
-        traitPrompt(people, subset, searchType);
-    }else if (descendantInput.includes(input.toLowerCase())) {
-        var person = getPersonArrayByName(getFirstName(), getLastName(), people);
-        var descendants = (getDescendants(person[0].id, people));
-        displayResultsVertical(people, descendants);
-    }else if(familyInput.includes(input.toLowerCase())){
-        person = getPersonArrayByName(getFirstName(), getLastName(), people);
-        var family = (getFamily(person[0], people));
-        displayResultsVertical(people, family);
-    }else if (kinInput.includes(input.toLowerCase())) {
-        person = getPersonArrayByName(getFirstName(), getLastName(), people);
-        getKin(person[0], people);
-    }else{
-        alert("Please enter correct value");
-        openPrompt(people);
-    }
+  var input = prompt("What would you like to "+searchType+"? (N)ame, (T)raits, (D)escendants, (F)amily, (K)in");
+  var nameInput = ["name", "nam","n"];
+  var traitInput = ["trait","traits", "triats", "triat", "t"];
+  var familyInput = ["fam","family", "f", "famly"];
+  var kinInput = ["kin","next of kin", "kins", "k"];
+  var descendantInput = ["des", "descendants", "descendant", "children", "kids", "spawn", "desc","d"];
+  if (nameInput.includes(input.toLowerCase())) {
+    searchByNamePrompt(people);
+  }else if (traitInput.includes(input.toLowerCase())) {
+    traitPrompt(people, subset, searchType);
+  }else if (descendantInput.includes(input.toLowerCase())) {
+    var person = getPersonArrayByName(getFirstName(), getLastName(), people);
+    var descendants = (getDescendants(person[0].id, people));
+    displayResultsVertical(people, descendants);
+  }else if(familyInput.includes(input.toLowerCase())){
+    person = getPersonArrayByName(getFirstName(), getLastName(), people);
+    var family = (getFamily(person[0], people));
+    displayResultsVertical(people, family);
+  }else if (kinInput.includes(input.toLowerCase())) {
+    person = getPersonArrayByName(getFirstName(), getLastName(), people);
+    getKin(person[0], people);
+  }else{
+    alert("Please enter correct value");
+    openPrompt(people);
+  }
 }
 function getTraitPrompt(trait){
   return prompt("Please enter the " + trait);
@@ -225,17 +236,17 @@ function traitPrompt(people, subset, searchType) {
   }
 }
 function searchByNamePrompt(people) {
-    var input = prompt("Do you know the (F)irst Name, (L)ast name, or (B)oth?");
-    if(input.toLowerCase() == "f"){
-      displayResultsVertical(people, initSearchByFirstName(getFirstName(), people));
-    }else if(input.toLowerCase() == "l"){
-      displayResultsVertical(people, initSearchByLastName(getLastName(), people));
-    }else if(input.toLowerCase() == "b"){
-      displayResultsVertical(people, initSearchByFirstAndLastName(getFirstName(), getLastName(), people));
-    }else{
-      alert("please enter a valid respsonse");
-      searchByNamePrompt();
-    }
+  var input = prompt("Do you know the (F)irst Name, (L)ast name, or (B)oth?");
+  if(input.toLowerCase() == "f"){
+    displayResultsVertical(people, initSearchByFirstName(getFirstName(), people));
+  }else if(input.toLowerCase() == "l"){
+    displayResultsVertical(people, initSearchByLastName(getLastName(), people));
+  }else if(input.toLowerCase() == "b"){
+    displayResultsVertical(people, initSearchByFirstAndLastName(getFirstName(), getLastName(), people));
+  }else{
+    alert("please enter a valid respsonse");
+    searchByNamePrompt();
+  }
 }
 function getAgeFromDob(dob){
   var splitDob = dob.split('/');
