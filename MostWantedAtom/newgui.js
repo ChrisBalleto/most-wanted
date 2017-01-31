@@ -94,9 +94,11 @@ function getBloodAuntUncleSpouse(person, people, spouses){
 }
 function getGrandParents(person, people){
   var personParents = getParents(person, people);
+  if (personParents.length > 0){
   for(var i = 0; i < personParents.length;i++){
     return getParents(personParents[i], people);
   }
+}
 }
 function getGrandChildren(person, people){
   var personChildren = getChildren(person, people);
@@ -104,6 +106,15 @@ function getGrandChildren(person, people){
       return getChildren(personChildren[i], people);
     }
   }
+function removeUndefinded(subset, people){
+  for (var i = 0; i < subset.length;i++){
+    if(subset[i] === undefined){
+      subset.pop(subset[i]);
+    }else{
+      return subset;
+    }
+  }
+}
 
 function getNephewNeice(person, people, auntsUncles=[]){
   var nephewNeice = [];
@@ -130,7 +141,7 @@ function getKin(person, people, kin=[]){
   var grandParents = getGrandParents(person, people);
   var grandChildren = getGrandChildren(person, people);
   kin = kin.concat(personNeiceNephew, getFamily(person, people), bloodAuntUncle, grandParents, grandChildren);
-  displayResultsVertical(people, kin);
+  displayResultsVertical(people, kin.clean(undefined));
 }
 function getFamily(person, people, family=[]){ //use .id for person parameter
   family = family.concat(getParents(person, people), getSpouse(person.id, people), getChildren(person.id, people), getSiblings(person, people));
